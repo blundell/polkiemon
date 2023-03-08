@@ -1,5 +1,7 @@
 package com.blundell.polkiemon
 
+import com.blundell.polkiemon.logging.Logger
+import com.blundell.polkiemon.logging.VoidLogger
 import retrofit2.Response
 
 class DatabasePokemonDataSource(
@@ -33,10 +35,10 @@ class NetworkPokemonDataSource(
     private fun <T> Response<T>.toResult(): Result<T> {
         val code = this.code()
         if (this.isSuccessful) {
-            logger.d("fetchAllPokemon() network success [$code].")
+            logger.d("fetchPokemon() network success [$code].")
             return Result.success(body()!!)
         } else {
-            logger.d("fetchAllPokemon() network error [$code], ${errorBody()}.")
+            logger.d("fetchPokemon() network error [$code], ${errorBody()}.")
             return Result.failure(IllegalStateException("[$code]"))
         }
     }

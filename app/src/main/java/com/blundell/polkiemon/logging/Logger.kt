@@ -1,4 +1,4 @@
-package com.blundell.polkiemon
+package com.blundell.polkiemon.logging
 
 import android.util.Log
 
