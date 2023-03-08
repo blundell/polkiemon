@@ -20,12 +20,12 @@ fun ListPokemonScreen(
     onNavigateToPokemon: (String) -> Unit
 ) {
     PolkiemonTheme {
-        when (val state = model.state.collectAsStateWithLifecycle().value) {
+        when (val state = model.screenState.collectAsStateWithLifecycle().value) {
             Empty -> EmptyView()
             is Failure -> ErrorView(errorMessage = state.errorMessage)
             Loading -> LoadingView()
             is Success -> ListPokemonView(
-                input = model,
+                model = model,
                 pokemon = state.pokemon,
                 onNavigateToPokemon = onNavigateToPokemon
             )

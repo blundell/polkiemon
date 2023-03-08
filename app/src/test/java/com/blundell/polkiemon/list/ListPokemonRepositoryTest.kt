@@ -27,7 +27,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        val result = repo.getPokemon().first()
+        val result = repo.getPokemon(ANY_RANGE).first()
 
         assertEquals(listOf(UI_JIGGLYPUFF), result)
     }
@@ -46,7 +46,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        val result = repo.getPokemon().first()
+        val result = repo.getPokemon(ANY_RANGE).first()
 
         assertEquals(listOf(UI_JIGGLYPUFF), result)
     }
@@ -59,7 +59,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        repo.getPokemon().first()
+        repo.getPokemon(ANY_RANGE).first()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -70,7 +70,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        repo.getPokemon().first()
+        repo.getPokemon(ANY_RANGE).first()
     }
 
     // Could have added a test for no network but network cache,
@@ -78,6 +78,7 @@ class ListPokemonRepositoryTest {
     // therefore covered by the DB test
 
     private companion object {
+        val ANY_RANGE = 0..10
         val API_JIGGLYPUFF = ApiPokemon(
             name = "Jigglypuff",
             moreInfoUrl = URL("https://pokeapi.co/api/v2/pokemon/39/"),
@@ -97,17 +98,29 @@ class ListPokemonRepositoryTest {
         override suspend fun getPokemon(limit: Int, offset: Int): Response<ApiPokemonCollection> {
             return Response.success(apiPokemonCollection)
         }
+
+        override suspend fun getPokemonDetails(id: Int): Response<ApiPokemonDetails> {
+            throw IllegalStateException("Unsupported here.")
+        }
     }
 
     private class FakeErrorPokeApiService(val errorCode: Int, val errorMsg: String = "Error") : PokeApiService {
         override suspend fun getPokemon(limit: Int, offset: Int): Response<ApiPokemonCollection> {
             return Response.error(errorCode, errorMsg.toResponseBody("text/html".toMediaType()))
         }
+
+        override suspend fun getPokemonDetails(id: Int): Response<ApiPokemonDetails> {
+            throw IllegalStateException("Unsupported here.")
+        }
     }
 
     private class FakeExceptionPokeApiService(val errorMsg: String) : PokeApiService {
         override suspend fun getPokemon(limit: Int, offset: Int): Response<ApiPokemonCollection> {
             throw IllegalStateException(errorMsg)
+        }
+
+        override suspend fun getPokemonDetails(id: Int): Response<ApiPokemonDetails> {
+            throw IllegalStateException("Unsupported here.")
         }
     }
 

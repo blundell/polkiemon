@@ -10,7 +10,7 @@ import com.blundell.polkiemon.details.PokemonDetailsViewModel
 fun DetailsScreen(
     model: PokemonDetailsViewModel,
 ) {
-    when (val state = model.state.collectAsStateWithLifecycle().value) {
+    when (val state = model.screenState.collectAsStateWithLifecycle().value) {
         is PokemonDetailsState.Error -> Text(text = "ERROR ${state.errorMessage}")
         PokemonDetailsState.Idle -> Text(text = "IDLE")
         PokemonDetailsState.Loading -> Text(text = "LOADING")

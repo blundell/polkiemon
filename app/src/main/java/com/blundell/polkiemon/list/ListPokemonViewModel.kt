@@ -1,6 +1,9 @@
 package com.blundell.polkiemon.list
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import coil.Coil
@@ -23,19 +26,27 @@ sealed class ListPokemonState {
     data class Failure(val errorMessage: String) : ListPokemonState()
 }
 
-interface ListPokemonInput {
-    fun onRefresh()
+enum class ListState {
+    IDLE,
+    LOADING,
+    PAGINATING,
+    ERROR,
 }
 
 class ListPokemonViewModel(
     application: Application
-) : AndroidViewModel(application), ListPokemonInput {
+) : AndroidViewModel(application) {
 
     // You could have a backing field here to ensure the state cannot be updated from outside the VM,
     // but I find that the extra code is not worth the maintenance over an agreed convention
-    val state: MutableStateFlow<ListPokemonState> = MutableStateFlow(Empty)
+    val screenState: MutableStateFlow<ListPokemonState> = MutableStateFlow(Empty)
 
     private val repository: ListPokemonRepository
+
+    // Could have used the JetPack paging library
+    private var page by mutableStateOf(1)
+    var morePokemon by mutableStateOf(false)
+    var listState by mutableStateOf(ListState.IDLE)
 
     /**
      * I'm doing all object instantiation here, but in a production app
@@ -55,23 +66,65 @@ class ListPokemonViewModel(
         loadAllPokemon()
     }
 
-    private fun loadAllPokemon() {
-        state.value = Loading
-        repository.getPokemon()
+    fun loadAllPokemon() {
+        if (listState != ListState.IDLE) {
+            return
+        }
+        if (page != 1 && !morePokemon) {
+            return
+        }
+        if (page == 1) {
+            listState = ListState.LOADING
+            screenState.value = Loading
+        } else {
+            listState = ListState.PAGINATING
+        }
+        val range: IntRange = ((page * PER_PAGE) - PER_PAGE) until (page * PER_PAGE)
+        repository.getPokemon(range)
             .onEach {
                 if (it.isEmpty()) {
-                    state.value = Empty
+                    screenState.value = Empty
                 } else {
-                    state.value = Success(it)
+                    morePokemon = it.size == PER_PAGE // The total per request, if less too near the end to paginate
+                    val current = screenState.value
+                    if (current is Success) {
+                        screenState.value = Success(current.combine(it))
+                    } else {
+                        screenState.value = Success(it)
+                    }
+                    listState = ListState.IDLE
+                    if (morePokemon) {
+                        page++
+                    }
                 }
             }
-            .catch { state.value = Failure(it.message ?: "Unrecognised failure.") }
+            .catch {
+                listState = ListState.ERROR
+                screenState.value = Failure(it.message ?: "Unrecognised failure.")
+            }
             .launchIn(viewModelScope)
     }
 
-    override fun onRefresh() {
+    private fun Success.combine(other: List<PokemonListItem>): List<PokemonListItem> {
+        return pokemon.toMutableList().also { it.addAll(other) }
+    }
+
+    fun onRefresh() {
+        onCleared()
         loadAllPokemon()
-        // We don't store their position in the list, as a refresh starts from the beginning/top
+        // We don't restore their position in the list, as a refresh starts from the beginning/top
+    }
+
+    override fun onCleared() {
+        page = 1
+        listState = ListState.IDLE
+        morePokemon = false
+        screenState.value = Empty
+        super.onCleared()
+    }
+
+    companion object {
+        private const val PER_PAGE = 60
     }
 }
 

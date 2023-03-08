@@ -28,7 +28,7 @@ class PokemonDetailsViewModel(
 
     // You could have a backing field here to ensure the state cannot be updated from outside the VM,
     // but I find that the extra code is not worth the maintenance over an agreed convention
-    val state: MutableStateFlow<PokemonDetailsState> = MutableStateFlow(PokemonDetailsState.Idle)
+    val screenState: MutableStateFlow<PokemonDetailsState> = MutableStateFlow(PokemonDetailsState.Idle)
 
     val name: String = checkNotNull(savedStateHandle[EXTRA_NAME])
 
@@ -46,10 +46,10 @@ class PokemonDetailsViewModel(
     }
 
     private fun loadPokemon() {
-        state.value = Loading
+        screenState.value = Loading
         repository.getPokemon(name)
-            .onEach { state.value = PokemonDetailsState.Success(it) }
-            .catch { state.value = PokemonDetailsState.Error(it.message ?: "Unrecognised failure.") }
+            .onEach { screenState.value = PokemonDetailsState.Success(it) }
+            .catch { screenState.value = PokemonDetailsState.Error(it.message ?: "Unrecognised failure.") }
             .launchIn(viewModelScope)
     }
 

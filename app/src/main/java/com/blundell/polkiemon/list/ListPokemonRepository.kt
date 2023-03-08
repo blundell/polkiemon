@@ -19,9 +19,7 @@ class ListPokemonRepository(
     private val logger: Logger = VoidLogger,
 ) {
 
-    fun getPokemon(): Flow<List<PokemonListItem>> = flow {
-        // TODO account for pagination
-        val range = 0..60
+    fun getPokemon(range: IntRange): Flow<List<PokemonListItem>> = flow {
         val dbPokemon = databaseDataSource.fetchPokemon(range)
         if (dbPokemon.isNotEmpty()) {
             emit(dbPokemon.toPokemonListItems())
