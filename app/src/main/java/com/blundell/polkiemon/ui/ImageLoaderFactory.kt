@@ -1,8 +1,9 @@
-package com.blundell.polkiemon
+package com.blundell.polkiemon.ui
 
 import android.content.Context
 import coil.ImageLoader
 import coil.util.DebugLogger
+import com.blundell.polkiemon.BuildConfig
 
 class ImageLoaderFactory(private val context: Context) : coil.ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader {

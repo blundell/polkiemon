@@ -1,4 +1,4 @@
-package com.blundell.polkiemon.ui
+package com.blundell.polkiemon.ui.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,18 +10,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.blundell.polkiemon.ListPokemonState.*
-import com.blundell.polkiemon.ListPokemonViewModel
+import com.blundell.polkiemon.list.ListPokemonState.*
+import com.blundell.polkiemon.list.ListPokemonViewModel
 import com.blundell.polkiemon.ui.theme.PolkiemonTheme
 
 @Composable
-fun ListPokemon(model: ListPokemonViewModel) {
+fun ListPokemonScreen(
+    model: ListPokemonViewModel,
+    onNavigateToPokemon: (String) -> Unit
+) {
     PolkiemonTheme {
         when (val state = model.state.collectAsStateWithLifecycle().value) {
             Empty -> EmptyView()
             is Failure -> ErrorView(errorMessage = state.errorMessage)
             Loading -> LoadingView()
-            is Success -> ListPokemonView(model, pokemon = state.pokemon)
+            is Success -> ListPokemonView(
+                input = model,
+                pokemon = state.pokemon,
+                onNavigateToPokemon = onNavigateToPokemon
+            )
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.blundell.polkiemon
+package com.blundell.polkiemon.list
 
 class ListPokemonViewModelTest {
 

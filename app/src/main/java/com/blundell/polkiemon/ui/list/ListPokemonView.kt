@@ -1,4 +1,4 @@
-package com.blundell.polkiemon.ui
+package com.blundell.polkiemon.ui.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,14 +14,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blundell.polkiemon.ListPokemonInput
-import com.blundell.polkiemon.PokemonListItem
+import com.blundell.polkiemon.list.ListPokemonInput
+import com.blundell.polkiemon.list.PokemonListItem
 
 @Composable
-fun ListPokemonView(listPokemonInput: ListPokemonInput, pokemon: List<PokemonListItem>) {
+fun ListPokemonView(
+    input: ListPokemonInput,
+    pokemon: List<PokemonListItem>,
+    onNavigateToPokemon: (String) -> Unit
+) {
     Column {
-        Header(listPokemonInput)
-        PokemonList(pokemon)
+        Header(input)
+        PokemonList(pokemon, onNavigateToPokemon)
     }
 }
 
@@ -53,12 +57,17 @@ private fun Header(input: ListPokemonInput) {
 }
 
 @Composable
-private fun PokemonList(pokemon: List<PokemonListItem>) {
+private fun PokemonList(
+    pokemon: List<PokemonListItem>,
+    onNavigateToPokemon: (String) -> Unit
+) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
         items(pokemon) {
-            PokemonCard(it)
+            PokemonCard(it) { name ->
+                onNavigateToPokemon(name)
+            }
         }
     }
 }

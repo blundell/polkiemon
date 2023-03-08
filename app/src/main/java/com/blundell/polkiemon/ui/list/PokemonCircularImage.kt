@@ -1,4 +1,4 @@
-package com.blundell.polkiemon.ui
+package com.blundell.polkiemon.ui.list
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size

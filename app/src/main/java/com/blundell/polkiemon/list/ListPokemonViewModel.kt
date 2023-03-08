@@ -1,12 +1,14 @@
-package com.blundell.polkiemon
+package com.blundell.polkiemon.list
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import coil.Coil
-import com.blundell.polkiemon.ListPokemonState.*
+import com.blundell.polkiemon.*
+import com.blundell.polkiemon.list.ListPokemonState.*
 import com.blundell.polkiemon.logging.AndroidLogger
 import com.blundell.polkiemon.logging.VoidLogger
+import com.blundell.polkiemon.ui.ImageLoaderFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
