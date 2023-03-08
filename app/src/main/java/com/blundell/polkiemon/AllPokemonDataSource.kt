@@ -2,19 +2,27 @@ package com.blundell.polkiemon
 
 import retrofit2.Response
 
-interface AllPokemonDataSource {
-    suspend fun fetchAllPokemon(): Result<ApiPokemonCollection>
+class DatabasePokemonDataSource(
+    private val database: PolkiemonDatabase,
+) {
+    fun fetchPokemon(range: IntRange): List<EntityPokemon> {
+        return database.pokemonDao().findByIdRange(range.first, range.count())
+    }
+
+    fun savePokemon(pokemon: List<EntityPokemon>) {
+        database.pokemonDao().insertAll(*pokemon.toTypedArray())
+    }
 }
 
-class NetworkAllPokemonDataSource(
+class NetworkPokemonDataSource(
     private val pokeApiService: PokeApiService,
     private val logger: Logger = VoidLogger,
-) : AllPokemonDataSource {
-    override suspend fun fetchAllPokemon(): Result<ApiPokemonCollection> {
+) {
+    suspend fun fetchPokemon(range: IntRange): Result<ApiPokemonCollection> {
         try {
-            return pokeApiService.getAllPokemon(
-                limit = 30,
-                offset = 0, // TODO pagination
+            return pokeApiService.getPokemon(
+                limit = range.count(),
+                offset = range.first, // TODO pagination
             ).toResult()
         } catch (e: Exception) {
             logger.d("Exception from retrofit ${e.message}.")

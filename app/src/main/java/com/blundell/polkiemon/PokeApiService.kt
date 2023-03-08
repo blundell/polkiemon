@@ -1,6 +1,7 @@
 package com.blundell.polkiemon
 
 import com.squareup.moshi.FromJson
+import com.squareup.moshi.Json
 import com.squareup.moshi.ToJson
 import retrofit2.Response
 import retrofit2.http.GET
@@ -10,7 +11,7 @@ import java.net.URL
 
 interface PokeApiService {
     @GET("pokemon")
-    suspend fun getAllPokemon(
+    suspend fun getPokemon(
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
     ): Response<ApiPokemonCollection>
@@ -20,12 +21,12 @@ data class ApiPokemonCollection(
     val count: Int,
     val next: String?,
     val previous: String?,
-    val results: List<ApiPokemon>,
+    @Json(name = "results") val pokemon: List<ApiPokemon>,
 )
 
 data class ApiPokemon(
     val name: String,
-    val url: URL, // TODO this not the image url, this is the url to the pokemon's details endpoint
+    @Json(name = "url") val moreInfoUrl: URL,
 )
 
 /**

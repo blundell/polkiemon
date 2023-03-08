@@ -1,18 +1,15 @@
 package com.blundell.polkiemon
 
-import android.net.Uri
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.blundell.polkiemon.ListPokemonState.*
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import java.net.URL
 
 sealed class ListPokemonState {
     object Empty : ListPokemonState()
@@ -21,7 +18,9 @@ sealed class ListPokemonState {
     data class Failure(val errorMessage: String) : ListPokemonState()
 }
 
-class ListPokemonViewModel : ViewModel() {
+class ListPokemonViewModel(
+    application: Application
+) : AndroidViewModel(application) {
 
     // You could have a backing field here to ensure the state cannot be updated from outside the VM,
     // but I find that the extra code is not worth the maintenance over an agreed convention
@@ -29,22 +28,18 @@ class ListPokemonViewModel : ViewModel() {
 
     private val repository: ListPokemonRepository
 
+    /**
+     * I'm doing all object instantiation here, but in a production app
+     * you would likely use a dependency injection framework for more flexibility.
+     */
     init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://pokeapi.co/api/v2/")
-            .addConverterFactory(
-                MoshiConverterFactory.create(
-                    Moshi.Builder()
-                        .add(UrlAdapter())
-                        .addLast(KotlinJsonAdapterFactory())
-                        .build()
-                )
-            )
-            .build()
-        val apiService = retrofit.create(PokeApiService::class.java)
+        val cacheDir = application.cacheDir
+        val apiService = PokeApiRetrofitFactory.create(cacheDir).create(PokeApiService::class.java)
         val logger = if (BuildConfig.DEBUG) AndroidLogger else VoidLogger
-        val dataSource = NetworkAllPokemonDataSource(apiService, logger)
-        repository = ListPokemonRepository(dataSource, Dispatchers.IO, logger)
+        val networkDataSource = NetworkPokemonDataSource(apiService, logger)
+        val database = PolkiemonDatabase.getInstance(application)
+        val databaseDataSource = DatabasePokemonDataSource(database)
+        repository = ListPokemonRepository(networkDataSource, databaseDataSource, Dispatchers.IO, logger)
         loadAllPokemon()
     }
 
@@ -61,7 +56,6 @@ class ListPokemonViewModel : ViewModel() {
             .catch { state.value = Failure(it.message ?: "Unrecognised failure.") }
             .launchIn(viewModelScope)
     }
-
 }
 
-data class PokemonListItem(val name: String, val imageUrl: Uri)
+data class PokemonListItem(val name: String, val imageUrl: URL)
