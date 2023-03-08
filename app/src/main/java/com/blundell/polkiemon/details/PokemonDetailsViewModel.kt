@@ -30,12 +30,11 @@ class PokemonDetailsViewModel(
     // but I find that the extra code is not worth the maintenance over an agreed convention
     val state: MutableStateFlow<PokemonDetailsState> = MutableStateFlow(PokemonDetailsState.Idle)
 
-    val name: String = checkNotNull(savedStateHandle["name"])
+    val name: String = checkNotNull(savedStateHandle[EXTRA_NAME])
 
     private val repository: PokemonDetailsRepository
 
     init {
-        println("XXX Details for $name")
         val cacheDir = application.cacheDir
         val apiService = PokeApiRetrofitFactory.create(cacheDir).create(PokeApiService::class.java)
         val logger = if (BuildConfig.DEBUG) AndroidLogger else VoidLogger
@@ -54,6 +53,9 @@ class PokemonDetailsViewModel(
             .launchIn(viewModelScope)
     }
 
+    companion object {
+        const val EXTRA_NAME = "name"
+    }
 }
 
 data class PokemonDetails(
