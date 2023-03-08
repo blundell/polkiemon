@@ -8,14 +8,22 @@ abstract class PolkiemonDatabase : RoomDatabase() {
     abstract fun pokemonDao(): PokemonDao
 
     companion object {
+
+        private lateinit var database: PolkiemonDatabase
         fun getInstance(context: Context): PolkiemonDatabase {
+            if (this::database.isInitialized) {
+                return database
+            }
             return Room.databaseBuilder(
-                context.applicationContext,
-                PolkiemonDatabase::class.java,
-                "polkiemonDatabase"
+                context = context.applicationContext,
+                klass = PolkiemonDatabase::class.java,
+                name = "polkiemonDatabase"
             )
                 .fallbackToDestructiveMigration()
                 .build()
+                .also {
+                    database = it
+                }
         }
     }
 }
@@ -45,5 +53,4 @@ data class EntityPokemon(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "full_name") val name: String,
     @ColumnInfo(name = "image_url") val imageUrl: String,
-
-    )
+)

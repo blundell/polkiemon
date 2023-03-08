@@ -43,6 +43,7 @@ class ListPokemonViewModel(
      * Also could have used a ViewModelFactory.
      */
     init {
+        // could be done in the application class
         Coil.setImageLoader(ImageLoaderFactory(application))
         val cacheDir = application.cacheDir
         val apiService = PokeApiRetrofitFactory.create(cacheDir).create(PokeApiService::class.java)
@@ -56,7 +57,7 @@ class ListPokemonViewModel(
 
     private fun loadAllPokemon() {
         state.value = Loading
-        repository.getAllPokemon()
+        repository.getPokemon()
             .onEach {
                 if (it.isEmpty()) {
                     state.value = Empty

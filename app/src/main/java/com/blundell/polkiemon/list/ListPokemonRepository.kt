@@ -19,7 +19,7 @@ class ListPokemonRepository(
     private val logger: Logger = VoidLogger,
 ) {
 
-    fun getAllPokemon(): Flow<List<PokemonListItem>> = flow {
+    fun getPokemon(): Flow<List<PokemonListItem>> = flow {
         // TODO account for pagination
         val range = 0..60
         val dbPokemon = databaseDataSource.fetchPokemon(range)

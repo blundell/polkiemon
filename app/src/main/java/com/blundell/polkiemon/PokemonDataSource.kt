@@ -11,6 +11,11 @@ class DatabasePokemonDataSource(
         return database.pokemonDao().findByIdRange(range.first, range.count())
     }
 
+    fun fetchPokemon(name: String): Result<EntityPokemon> {
+        // TODO try catch
+        return Result.success(database.pokemonDao().findByName(name))
+    }
+
     fun savePokemon(pokemon: List<EntityPokemon>) {
         database.pokemonDao().insertAll(*pokemon.toTypedArray())
     }
@@ -26,6 +31,15 @@ class NetworkPokemonDataSource(
                 limit = range.count(),
                 offset = range.first, // TODO pagination
             ).toResult()
+        } catch (e: Exception) {
+            logger.d("Exception from retrofit ${e.message}.")
+            return Result.failure(IllegalStateException("[400] Likely malformed response.", e))
+        }
+    }
+
+    suspend fun fetchPokemon(id: Int): Result<ApiPokemonDetails> {
+        try {
+            return pokeApiService.getPokemonDetails(id).toResult()
         } catch (e: Exception) {
             logger.d("Exception from retrofit ${e.message}.")
             return Result.failure(IllegalStateException("[400] Likely malformed response.", e))

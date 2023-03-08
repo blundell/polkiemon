@@ -27,7 +27,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        val result = repo.getAllPokemon().first()
+        val result = repo.getPokemon().first()
 
         assertEquals(listOf(UI_JIGGLYPUFF), result)
     }
@@ -46,7 +46,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        val result = repo.getAllPokemon().first()
+        val result = repo.getPokemon().first()
 
         assertEquals(listOf(UI_JIGGLYPUFF), result)
     }
@@ -59,7 +59,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        repo.getAllPokemon().first()
+        repo.getPokemon().first()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -70,7 +70,7 @@ class ListPokemonRepositoryTest {
             Dispatchers.Unconfined,
         )
 
-        repo.getAllPokemon().first()
+        repo.getPokemon().first()
     }
 
     // Could have added a test for no network but network cache,

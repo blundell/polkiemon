@@ -26,7 +26,12 @@ class PokeApiRetrofitFactory {
     }
 
     companion object {
+
+        private lateinit var retrofit: Retrofit
         fun create(cacheDir: File): Retrofit {
+            if (this::retrofit.isInitialized) {
+                return retrofit
+            }
             val httpClient = OkHttpClient.Builder()
                 .cache(Cache(File(cacheDir, "pokeapi-http-cache"), (5 * 1024L * 1024L))) // 5MB
                 .addNetworkInterceptor(CacheInterceptor)
@@ -43,6 +48,9 @@ class PokeApiRetrofitFactory {
                     )
                 )
                 .build()
+                .also {
+                    retrofit = it
+                }
         }
     }
 }
