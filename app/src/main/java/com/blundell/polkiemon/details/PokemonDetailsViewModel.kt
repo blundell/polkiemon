@@ -28,7 +28,7 @@ class PokemonDetailsViewModel(
 
     // You could have a backing field here to ensure the state cannot be updated from outside the VM,
     // but I find that the extra code is not worth the maintenance over an agreed convention
-    val screenState: MutableStateFlow<PokemonDetailsState> = MutableStateFlow(PokemonDetailsState.Idle)
+    val screenState: MutableStateFlow<PokemonDetailsState> = MutableStateFlow(Idle)
 
     val name: String = checkNotNull(savedStateHandle[EXTRA_NAME])
 
