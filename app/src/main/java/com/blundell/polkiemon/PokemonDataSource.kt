@@ -7,16 +7,17 @@ import retrofit2.Response
 class DatabasePokemonDataSource(
     private val database: PolkiemonDatabase,
 ) {
-    fun fetchPokemon(range: IntRange): List<EntityPokemon> {
+    suspend fun fetchPokemon(range: IntRange): List<EntityPokemon> {
         return database.pokemonDao().findByIdRange(range.first, range.count())
     }
 
-    fun fetchPokemon(name: String): Result<EntityPokemon> {
-        // TODO try catch
+    suspend fun fetchPokemon(name: String): Result<EntityPokemon> {
+        // At the moment the app will always return a Pokemon when this is called
+        // That may not always be the case and error handling / Result failure could be added
         return Result.success(database.pokemonDao().findByName(name))
     }
 
-    fun savePokemon(pokemon: List<EntityPokemon>) {
+    suspend fun savePokemon(pokemon: List<EntityPokemon>) {
         database.pokemonDao().insertAll(*pokemon.toTypedArray())
     }
 }

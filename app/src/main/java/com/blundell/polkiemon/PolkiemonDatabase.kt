@@ -31,20 +31,14 @@ abstract class PolkiemonDatabase : RoomDatabase() {
 @Dao
 interface PokemonDao {
 
-    @Query("SELECT * FROM pokemon")
-    fun getAll(): List<EntityPokemon>
-
     @Query("SELECT * FROM pokemon LIMIT :count OFFSET :startId")
-    fun findByIdRange(startId: Int, count: Int): List<EntityPokemon>
-
-    @Query("SELECT * FROM pokemon WHERE id=:id")
-    fun findById(id: Int): EntityPokemon
+    suspend fun findByIdRange(startId: Int, count: Int): List<EntityPokemon>
 
     @Query("SELECT * FROM pokemon WHERE full_name LIKE :name LIMIT 1")
-    fun findByName(name: String): EntityPokemon
+    suspend fun findByName(name: String): EntityPokemon
 
     @Upsert
-    fun insertAll(vararg pokemon: EntityPokemon)
+    suspend fun insertAll(vararg pokemon: EntityPokemon)
 
 }
 
