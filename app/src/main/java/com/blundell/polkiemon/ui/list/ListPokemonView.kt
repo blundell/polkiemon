@@ -3,6 +3,7 @@ package com.blundell.polkiemon.ui.list
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
@@ -34,19 +35,18 @@ fun ListPokemonView(
 private fun PokemonList(
     model: ListPokemonViewModel,
     pokemon: List<PokemonListItem>,
-    onNavigateToPokemon: (String) -> Unit
+    onNavigateToPokemon: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val shouldStartPaginate = remember {
+    val startPagination = remember {
         derivedStateOf {
-            model.morePokemon &&
-                    (listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -20) >=
-                    (listState.layoutInfo.totalItemsCount - 10)
+            model.morePokemon && listState.lastNItemsVisible(10)
         }
     }
-    LaunchedEffect(key1 = shouldStartPaginate.value) {
-        if (shouldStartPaginate.value && model.listState == ListState.IDLE)
+    LaunchedEffect(key1 = startPagination.value) {
+        if (startPagination.value && model.listState == ListState.IDLE) {
             model.loadAllPokemon()
+        }
     }
     LazyColumn(
         state = listState,
@@ -58,20 +58,36 @@ private fun PokemonList(
             }
         }
         item(key = model.listState) {
-            when (model.listState) {
-                ListState.IDLE -> {
-                    /** Don't show anything */
-                }
-                ListState.LOADING -> {
-                    Text("LOADING")
-                }
-                ListState.PAGINATING -> {
-                    Text("PAGINATING")
-                }
-                ListState.ERROR -> {
-                    Text("ERROR")
-                }
-            }
+            ListPaginationFooter(model)
         }
     }
+}
+
+/**
+ * Left the UI here very simple, could be improved a lot
+ */
+@Composable
+private fun ListPaginationFooter(model: ListPokemonViewModel) {
+    when (model.listState) {
+        ListState.IDLE -> {
+            /** Don't show anything */
+        }
+        ListState.LOADING,
+        ListState.PAGINATING -> {
+            Text("LOADING")
+        }
+        ListState.ERROR -> {
+            Text("ERROR")
+        }
+    }
+}
+
+/**
+ * Returns true if the the list scroll state is in a position that the Nth item is visible.
+ * n: the number of items from the end to start to return true for
+ * Note: if no items are visible this will return false
+ */
+private fun LazyListState.lastNItemsVisible(n: Int): Boolean {
+    val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -(n * 2)
+    return lastVisibleItemIndex >= (layoutInfo.totalItemsCount - n)
 }

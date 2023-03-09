@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.blundell.polkiemon.*
-import com.blundell.polkiemon.details.PokemonDetailsState.Loading
+import com.blundell.polkiemon.details.PokemonDetailsState.*
 import com.blundell.polkiemon.logging.AndroidLogger
 import com.blundell.polkiemon.logging.VoidLogger
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ sealed class PokemonDetailsState {
     object Idle : PokemonDetailsState()
     object Loading : PokemonDetailsState()
     data class Success(val details: PokemonDetails) : PokemonDetailsState()
-    data class Error(val errorMessage: String) : PokemonDetailsState()
+    data class Error(val errorMessage: String, val previousDetails: PokemonDetails? = null) : PokemonDetailsState()
 }
 
 class PokemonDetailsViewModel(
@@ -48,8 +48,15 @@ class PokemonDetailsViewModel(
     private fun loadPokemon() {
         screenState.value = Loading
         repository.getPokemon(name)
-            .onEach { screenState.value = PokemonDetailsState.Success(it) }
-            .catch { screenState.value = PokemonDetailsState.Error(it.message ?: "Unrecognised failure.") }
+            .onEach { screenState.value = Success(it) }
+            .catch {
+                if (screenState.value is Success) {
+                    val previousDetails = (screenState.value as Success).details
+                    screenState.value = Error(it.message ?: "Unrecognised failure.", previousDetails)
+                } else {
+                    screenState.value = Error(it.message ?: "Unrecognised failure.")
+                }
+            }
             .launchIn(viewModelScope)
     }
 

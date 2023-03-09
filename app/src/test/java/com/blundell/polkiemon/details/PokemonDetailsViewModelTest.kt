@@ -1,6 +1,6 @@
-package com.blundell.polkiemon.list
+package com.blundell.polkiemon.details
 
-class ListPokemonViewModelTest {
+class PokemonDetailsViewModelTest {
 
     /**
      * In a production app, I would have tested the ViewModel interactions

@@ -46,6 +46,8 @@ class ListPokemonViewModel(
     // Could have used the JetPack paging library
     private var page by mutableStateOf(1)
     var morePokemon by mutableStateOf(false)
+
+    // I would like to have a singular UI state exposed, but skipping for time
     var listState by mutableStateOf(ListState.IDLE)
 
     /**
@@ -100,7 +102,14 @@ class ListPokemonViewModel(
             }
             .catch {
                 listState = ListState.ERROR
-                screenState.value = Failure(it.message ?: "Unrecognised failure.")
+                // Only change the state to failure if we haven't been successful
+                // This allows the user to browse the cached data rather than
+                // change to the '404' screen
+                // With more time a better UX would be to have a more subtle UI for errors
+                // so that it wasn't just as screen swap
+                if (screenState.value !is Success) {
+                    screenState.value = Failure(it.message ?: "Unrecognised failure.")
+                }
             }
             .launchIn(viewModelScope)
     }

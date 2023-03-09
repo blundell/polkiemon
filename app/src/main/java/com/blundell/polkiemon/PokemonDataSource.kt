@@ -29,7 +29,7 @@ class NetworkPokemonDataSource(
         try {
             return pokeApiService.getPokemon(
                 limit = range.count(),
-                offset = range.first, // TODO pagination
+                offset = range.first,
             ).toResult()
         } catch (e: Exception) {
             logger.d("Exception from retrofit ${e.message}.")
@@ -49,10 +49,10 @@ class NetworkPokemonDataSource(
     private fun <T> Response<T>.toResult(): Result<T> {
         val code = this.code()
         if (this.isSuccessful) {
-            logger.d("fetchPokemon() network success [$code].")
+            logger.d("fetchPokemon() network datasource success [$code].")
             return Result.success(body()!!)
         } else {
-            logger.d("fetchPokemon() network error [$code], ${errorBody()}.")
+            logger.d("fetchPokemon() network datasource error [$code], ${errorBody()}.")
             return Result.failure(IllegalStateException("[$code]"))
         }
     }
