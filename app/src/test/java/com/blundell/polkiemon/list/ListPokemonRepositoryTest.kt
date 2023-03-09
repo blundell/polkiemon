@@ -127,11 +127,9 @@ class ListPokemonRepositoryTest {
     private object FakeEmptyDatabase : PolkiemonDatabase() {
         override fun pokemonDao(): PokemonDao {
             return object : PokemonDao {
-                override fun getAll(): List<EntityPokemon> = emptyList()
-                override fun findByIdRange(startId: Int, count: Int): List<EntityPokemon> = emptyList()
-                override fun findById(id: Int): EntityPokemon = throw IllegalStateException("Not found $id.")
-                override fun findByName(name: String): EntityPokemon = throw IllegalStateException("Not found $name.")
-                override fun insertAll(vararg pokemon: EntityPokemon) = Unit
+                override suspend fun findByIdRange(startId: Int, count: Int): List<EntityPokemon> = emptyList()
+                override suspend fun findByName(name: String): EntityPokemon = throw IllegalStateException("Not found $name.")
+                override suspend fun insertAll(vararg pokemon: EntityPokemon) = Unit
             }
         }
 
@@ -149,11 +147,9 @@ class ListPokemonRepositoryTest {
     private class FakeSuccessDatabase(val pokemon: EntityPokemon) : PolkiemonDatabase() {
         override fun pokemonDao(): PokemonDao {
             return object : PokemonDao {
-                override fun getAll(): List<EntityPokemon> = emptyList()
-                override fun findByIdRange(startId: Int, count: Int): List<EntityPokemon> = listOf(pokemon)
-                override fun findById(id: Int): EntityPokemon = throw IllegalStateException("Not found $id.")
-                override fun findByName(name: String): EntityPokemon = throw IllegalStateException("Not found $name.")
-                override fun insertAll(vararg pokemon: EntityPokemon) = Unit
+                override suspend fun findByIdRange(startId: Int, count: Int): List<EntityPokemon> = listOf(pokemon)
+                override suspend fun findByName(name: String): EntityPokemon = throw IllegalStateException("Not found $name.")
+                override suspend fun insertAll(vararg pokemon: EntityPokemon) = Unit
             }
         }
 

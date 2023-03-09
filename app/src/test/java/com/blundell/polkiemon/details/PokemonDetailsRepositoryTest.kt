@@ -149,11 +149,9 @@ class PokemonDetailsRepositoryTest {
     private class FakeSuccessDatabase(val pokemon: EntityPokemon) : PolkiemonDatabase() {
         override fun pokemonDao(): PokemonDao {
             return object : PokemonDao {
-                override fun getAll(): List<EntityPokemon> = emptyList()
-                override fun findByIdRange(startId: Int, count: Int): List<EntityPokemon> = throw IllegalStateException("Not supported.")
-                override fun findById(id: Int): EntityPokemon = throw IllegalStateException("Not found $id.")
-                override fun findByName(name: String): EntityPokemon = pokemon
-                override fun insertAll(vararg pokemon: EntityPokemon) = Unit
+                override suspend fun findByIdRange(startId: Int, count: Int): List<EntityPokemon> = throw IllegalStateException("Not supported.")
+                override suspend fun findByName(name: String): EntityPokemon = pokemon
+                override suspend fun insertAll(vararg pokemon: EntityPokemon) = Unit
             }
         }
 
