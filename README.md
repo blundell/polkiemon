@@ -15,7 +15,20 @@ the endpoint. (Show name and image for each Pokemon) DONE
 3. Add some animations (fade in/fade out animations, etc) DONE
 4. Add an option to search for a Pokemon by name.
 
-// Search is not implemented
-// I have not done landscape designs, you get less details in landscape.
-// There are some unhandled edge cases at the very end of the full list of Pokemon
+### Thoughts
 
+- Search is not implemented
+- I have not done landscape designs, you get less details in landscape.
+- There are some unhandled edge cases at the very end of the full list of Pokemon
+- There is no modularisation at this point, but creating a modular architecture would help separate concerns and have more people working in parallel
+
+Some good starting places for the app are here:
+- https://github.com/blundell/polkiemon/tree/main/app/src/main/java/com/blundell/polkiemon
+- https://github.com/blundell/polkiemon/blob/main/app/src/main/java/com/blundell/polkiemon/ui/list/ListPokemonScreen.kt
+- https://github.com/blundell/polkiemon/blob/main/app/src/main/java/com/blundell/polkiemon/details/PokemonDetailsViewModel.kt
+
+Here is the app in action
+
+| List | Details | Offline |
+| --- | --- | --- |
+|![](gifs/list-scroll.gif)|![](gifs/details.gif)|![](gifs/offline.gif)|
